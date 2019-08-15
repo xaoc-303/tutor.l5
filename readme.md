@@ -30,3 +30,10 @@
     php artisan tinker
     \DB::table('migrations')->get();
     ```
+
+5. NPM install
+
+    ```
+    npm install
+    npm run watch
+    ```
