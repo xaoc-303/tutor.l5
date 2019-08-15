@@ -1716,6 +1716,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -1756,6 +1766,23 @@ __webpack_require__.r(__webpack_exports__);
         prev_page_url: links.prev
       };
       this.pagination = pagination;
+    },
+    deleteArticle: function deleteArticle(id) {
+      var _this2 = this;
+
+      if (confirm('Are You Sure?')) {
+        fetch("api/article/".concat(id), {
+          method: 'delete'
+        }).then(function (res) {
+          return res.json();
+        }).then(function (data) {
+          alert('Article Removed');
+
+          _this2.fetchArticles();
+        })["catch"](function (err) {
+          return console.log(err);
+        });
+      }
     }
   }
 });
@@ -37130,9 +37157,36 @@ var render = function() {
         _vm._l(_vm.articles, function(article) {
           return _c(
             "div",
-            { key: article.id, staticClass: "card card-body mb-2" },
+            {
+              key: article.id,
+              staticClass: "card card-body shadow p-3 mb-5 bg-white rounded"
+            },
             [
-              _c("h3", [_vm._v(_vm._s(article.title))]),
+              _c("div", { staticClass: "d-flex bd-highlight" }, [
+                _c("div", { staticClass: "flex-grow-1 bd-highlight" }, [
+                  _c("h3", [_vm._v(_vm._s(article.title))])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "bd-highlight" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "close float-right",
+                      attrs: { type: "button", "aria-label": "Close" },
+                      on: {
+                        click: function($event) {
+                          return _vm.deleteArticle(article.id)
+                        }
+                      }
+                    },
+                    [
+                      _c("span", { attrs: { "aria-hidden": "true" } }, [
+                        _vm._v("×")
+                      ])
+                    ]
+                  )
+                ])
+              ]),
               _vm._v(" "),
               _c("p", [_vm._v(_vm._s(article.body))])
             ]

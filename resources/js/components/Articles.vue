@@ -9,8 +9,18 @@
                 <li v-bind:class="[{disabled: !pagination.next_page_url}]" class="page-item"><a class="page-link" href="#" @click="fetchArticles(pagination.next_page_url)">Next</a></li>
             </ul>
         </nav>
-        <div class="card card-body mb-2" v-for="article in articles" v-bind:key="article.id">
-            <h3>{{ article.title }}</h3>
+
+        <div class="card card-body shadow p-3 mb-5 bg-white rounded" v-for="article in articles" v-bind:key="article.id">
+            <div class="d-flex bd-highlight">
+                <div class="flex-grow-1 bd-highlight">
+                    <h3>{{ article.title }}</h3>
+                </div>
+                <div class="bd-highlight">
+                    <button type="button" @click="deleteArticle(article.id)" class="close float-right" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
             <p>{{ article.body }}</p>
         </div>
     </div>
@@ -58,6 +68,19 @@ export default {
             }
 
             this.pagination = pagination;
+        },
+        deleteArticle(id) {
+            if (confirm('Are You Sure?')) {
+                fetch(`api/article/${id}`, {
+                    method: 'delete'
+                })
+                .then(res => res.json())
+                .then(data => {
+                    alert('Article Removed');
+                    this.fetchArticles();
+                })
+                .catch(err => console.log(err));
+            }
         }
     }
 }
