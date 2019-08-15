@@ -26,6 +26,7 @@
 
     ```
     php artisan migrate
+    php artisan db:seed
     php artisan tinker
     \DB::table('migrations')->get();
     ```
