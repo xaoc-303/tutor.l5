@@ -57,6 +57,22 @@ services:
     networks:
       - app-network
 
+  #Redis Service
+  redis:
+    image: redis
+    container_name: redis
+    restart: always
+    hostname: redis
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    logging:
+      driver: none
+    networks:
+      - app-network
+
+  #Adminer
   adminer:
     image: adminer
     container_name: adminer
@@ -72,4 +88,8 @@ networks:
 #Volumes
 volumes:
   mysql-data:
+    driver: local
+  redis-data:
+    driver: local
+  rabbitmq-data:
     driver: local

@@ -1,6 +1,6 @@
 ## Tutor.L5
 
-### Docker, Laravel, Vue, MySQL
+### Docker, Laravel, Vue, MySQL, Adminer, Queue, Redis, Parser
 
 1. System startup.
 
@@ -38,4 +38,11 @@
     npm run watch
     ```
    
-5. Check http://localhost in the browser.
+5. Start parser and queue processing
+
+    ```
+    php artisan parser
+    php artisan queue:listen --queue=petrovich
+    ```
+
+6. Check http://localhost in the browser.
