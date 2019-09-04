@@ -1,6 +1,11 @@
 <template>
     <div>
-        <Pagination v-bind:pagination="pagination" @fetchArticles="fetchArticles"></Pagination>
+        <Pagination
+            :current-page.sync="currentPage"
+            :per-page="perPage"
+            :total-items="totalItems"
+            @update:currentPage="fetchArticles"
+        ></Pagination>
 
         <div v-for="article in articles">
             <Article :article="article" @currentArticle="currentArticle" @editArticle="editArticle"></Article>
@@ -16,6 +21,7 @@ import ShowModal from "./ShowModal";
 import Pagination from "./Pagination";
 import EditModal from "./EditModal";
 import Article from "./Article";
+
 export default {
     name: "Articles",
     components: {
@@ -27,6 +33,9 @@ export default {
 
     data() {
         return {
+            currentPage: 1,
+            perPage: 3,
+            totalItems: 0,
             articles: [],
             article: {
                 id: '',
@@ -34,39 +43,31 @@ export default {
                 body: ''
             },
             article_id: '',
-            pagination: {},
             edit: false
         }
     },
 
     created() {
         console.log(this.$options.name + ' created');
-        this.fetchArticles();
+        this.fetchArticles(this.currentPage);
     },
 
     methods: {
-        fetchArticles(page_url) {
+        fetchArticles(page) {
             console.log(this.$options.name + ' fetchArticles');
-            let vm = this;
-            page_url = page_url || '/api/articles';
-            fetch(page_url)
-                .then(res => res.json())
-                .then(res => {
-                    this.articles = res.data;
-                    vm.makePagination(res.meta, res.links);
+            return axios
+                .get('/api/articles/', {
+                    params: {
+                        page: page,
+                        per_page: this.perPage,
+                    },
                 })
-                .catch(err => console.log(err));
-        },
-        makePagination(meta, links) {
-            console.log(this.$options.name + ' makePagination');
-            let pagination = {
-                current_page: meta.current_page,
-                last_page: meta.last_page,
-                next_page_url: links.next,
-                prev_page_url: links.prev
-            };
-
-            this.pagination = pagination;
+                .then(({ data }) => {
+                    this.articles = data.data;
+                    this.perPage = data.meta.per_page;
+                    this.totalItems = data.meta.total;
+                })
+                .catch(err => console.error(err));
         },
         addArticle() {
             console.log(this.$options.name + ' addArticle');
