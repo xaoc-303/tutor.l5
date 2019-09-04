@@ -1,0 +1,39 @@
+---
+
+ip: "192.168.10.10"
+
+hostname: tutor-l5
+name: tutor-l5
+provider: virtualbox
+
+authorize: ~/.ssh/id_rsa.pub
+
+keys:
+    - ~/.ssh/id_rsa
+
+folders:
+    - map: ./
+      to: /home/vagrant/tutor-l5
+
+sites:
+    - map: tutor-l5.localhost
+      to: /home/vagrant/tutor-l5/public
+      schedule: true
+
+databases:
+    - tutor_l5
+
+# blackfire:
+#     - id: foo
+#       token: bar
+#       client-id: foo
+#       client-token: bar
+
+# ports:
+#     - send: 8025
+#       to: 8025
+#     - send: 50000
+#       to: 5000
+#     - send: 7777
+#       to: 777
+#       protocol: udp

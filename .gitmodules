@@ -1,0 +1,4 @@
+[submodule "Homestead"]
+	path = .provision/homestead
+	url = https://github.com/laravel/homestead.git
+	branch = master
