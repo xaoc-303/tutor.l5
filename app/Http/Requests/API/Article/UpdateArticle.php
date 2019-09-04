@@ -25,7 +25,7 @@ class UpdateArticle extends FormRequest
     {
         return [
             'title' => 'required|string',
-            'body' => 'text',
+            'body' => 'required|string',
         ];
     }
 }

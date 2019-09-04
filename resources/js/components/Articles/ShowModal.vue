@@ -1,15 +1,14 @@
 <template>
-    <div>
-        <b-modal :id="idModal" :title="article.title" ok-only>
-            <p>{{ article.body }}</p>
-        </b-modal>
-    </div>
+    <b-modal id="article-show-modal" :title="article.title" ok-only>
+        <p>{{ article.body }}</p>
+    </b-modal>
 </template>
 
 <script>
 export default {
-    name: "ShowModal",
-    props: ['article', 'idModal'],
+    props: {
+        article: Object,
+    },
     mounted() {
         console.log('ShowModal component mounted.');
     }

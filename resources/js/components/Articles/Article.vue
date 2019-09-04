@@ -3,13 +3,23 @@
         <b-card class="shadow mb-5">
             <b-card-title class="clearfix">
                 <h3 class="float-left">{{ article.title }}</h3>
-                <button type="button" @click="deleteArticle(article.id)" class="close float-right mr-2" aria-label="Close">
+                <button type="button"
+                        @click="deleteArticle(article)"
+                        class="close float-right mr-2"
+                        aria-label="Close"
+                >
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <button type="button" @click.prevent="editArticle(article)" class="close float-right mr-2" aria-label="Close" v-b-modal="'article-edit-modal'">
+                <button type="button"
+                        @click.prevent="editArticle(article)"
+                        class="close float-right mr-2"
+                >
                     <span aria-hidden="true">&mldr;</span>
                 </button>
-                <button type="button" @click.prevent="currentArticle(article)" class="close float-right mr-2" aria-label="Close" v-b-modal="'article-show-modal'">
+                <button type="button"
+                        @click.prevent="showArticle(article)"
+                        class="close float-right mr-2"
+                >
                     <span aria-hidden="true">&telrec;</span>
                 </button>
             </b-card-title>
@@ -21,33 +31,24 @@
 <script>
 export default {
     name: "Article",
-    props: ['article'],
+    props: {
+        article: {
+            type: Object,
+            required: true,
+        },
+    },
     methods: {
-        currentArticle(article) {
-            console.log(this.$options.name + ' currentArticle');
-            this.$emit('currentArticle', article);
+        showArticle(article) {
+            console.log(this.$options.name + ' showArticle');
+            this.$emit('showArticle', article);
         },
         editArticle(article) {
             console.log(this.$options.name + ' editArticle');
             this.$emit('editArticle', article);
         },
-        deleteArticle(id) {
-            if (confirm('Are You Sure?'+id)) {
-                fetch(`api/article/${id}`, {
-                    method: 'delete'
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        console.log('Article Removed');
-                        this.$bvToast.toast(`Article Removed`, {
-                            toaster: "b-toaster-bottom-right",
-                            autoHideDelay: 3000,
-                            variant: "success",
-                            title: 'Success'
-                        });
-                        this.$parent.fetchArticles();
-                    })
-                    .catch(err => console.log(err));
+        deleteArticle(article) {
+            if (confirm('Are You Sure?')) {
+                this.$emit('deleteArticle', article);
             }
         }
     },

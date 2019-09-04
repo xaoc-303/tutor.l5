@@ -1,17 +1,17 @@
 <template>
     <b-modal
-        id="article-edit-modal"
-        title="Edit"
+        id="article-create-modal"
+        title="Create"
         hide-footer
     >
-        <form ref="form" @submit.stop.prevent="updateArticle">
+        <form ref="form" @submit.stop.prevent="storeArticle">
             <b-form-group
                 label="Title:"
                 label-for="title-input"
             >
                 <b-form-input
                     id="title-input"
-                    v-model="article.title"
+                    v-model="title"
                     required
                 ></b-form-input>
             </b-form-group>
@@ -22,7 +22,7 @@
             >
                 <b-form-textarea
                     id="body-input"
-                    v-model="article.body"
+                    v-model="body"
                     required
                 ></b-form-textarea>
             </b-form-group>
@@ -31,7 +31,7 @@
                 variant="primary"
                 class="float-right"
             >
-                Update
+                Create
             </b-button>
         </form>
     </b-modal>
@@ -39,14 +39,17 @@
 
 <script>
 export default {
-    props: {
-        article: Object,
+    data() {
+        return {
+            title: null,
+            body: null,
+        }
     },
     methods: {
-        updateArticle() {
-            this.$emit('updateArticle', {
-                title: this.article.title,
-                body: this.article.body,
+        storeArticle() {
+            this.$emit('storeArticle', {
+                title: this.title,
+                body: this.body,
             });
         }
     },

@@ -7,54 +7,54 @@
             @update:currentPage="fetchArticles"
         ></Pagination>
 
+        <b-button class="mb-2" @click="createArticle" variant="success">Create Article</b-button>
+
         <div v-for="article in articles">
-            <Article :article="article" @currentArticle="currentArticle" @editArticle="editArticle"></Article>
+            <Article :article="article"
+                     @showArticle="showArticle"
+                     @editArticle="editArticle"
+                     @deleteArticle="deleteArticle"
+            ></Article>
         </div>
 
-        <ShowModal :id-modal="'article-show-modal'" :article="article"></ShowModal>
-        <EditModal :id-modal="'article-edit-modal'" :article="article" @addArticle="addArticle"></EditModal>
+        <ShowModal :article="article"></ShowModal>
+        <CreateModal @storeArticle="storeArticle"></CreateModal>
+        <EditModal :article="article" @updateArticle="updateArticle"></EditModal>
     </div>
 </template>
 
 <script>
 import ShowModal from "./ShowModal";
 import Pagination from "./Pagination";
+import CreateModal from "./CreateModal";
 import EditModal from "./EditModal";
 import Article from "./Article";
 
 export default {
-    name: "Articles",
     components: {
         Article,
+        CreateModal,
         EditModal,
         Pagination,
-        ShowModal
+        ShowModal,
     },
-
     data() {
         return {
             currentPage: 1,
             perPage: 3,
             totalItems: 0,
             articles: [],
-            article: {
-                id: '',
-                title: '',
-                body: ''
-            },
-            article_id: '',
-            edit: false
+            article: {},
+            edit: false,
         }
     },
 
     created() {
-        console.log(this.$options.name + ' created');
         this.fetchArticles(this.currentPage);
     },
 
     methods: {
         fetchArticles(page) {
-            console.log(this.$options.name + ' fetchArticles');
             return axios
                 .get('/api/articles/', {
                     params: {
@@ -69,68 +69,59 @@ export default {
                 })
                 .catch(err => console.error(err));
         },
-        addArticle() {
-            console.log(this.$options.name + ' addArticle');
-            if (this.edit === false) {
-                console.log(this.$options.name + ' addArticle add');
-                // Add
-                fetch('api/article', {
-                    method: 'post',
-                    body: JSON.stringify(this.article),
-                    headers: {
-                        'content-type': 'application/json'
-                    }
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        this.article.title = '';
-                        this.article.body = '';
-                        console.log('Article Added');
-                        this.$bvToast.toast(`Article Added`, {
-                            toaster: "b-toaster-bottom-right",
-                            autoHideDelay: 3000,
-                            variant: "success",
-                            title: 'Success'
-                        });
-                        this.fetchArticles();
-                    })
-                    .catch(err => console.log(err));
-            } else {
-                console.log(this.$options.name + ' addArticle update');
-                // Update
-                fetch('api/article', {
-                    method: 'put',
-                    body: JSON.stringify(this.article),
-                    headers: {
-                        'content-type': 'application/json'
-                    }
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        this.article.title = '';
-                        this.article.body = '';
-                        console.log('Article Updated');
-                        this.$bvToast.toast(`Article Updated`, {
-                            toaster: "b-toaster-bottom-right",
-                            autoHideDelay: 3000,
-                            variant: "success",
-                            title: 'Success'
-                        });
-                        this.fetchArticles();
-                    })
-                    .catch(err => console.log(err));
-            }
+        createArticle() {
+            this.$bvModal.show('article-create-modal');
         },
-        currentArticle(article) {
-            console.log(this.$options.name + ' currentArticle');
-            this.article.article_id = article.id;
-            this.article.title = article.title;
-            this.article.body = article.body;
+        storeArticle({ title, body }) {
+            return axios
+                .post(`api/articles`, {
+                    title: title,
+                    body: body,
+                })
+                .then(({ article }) => {
+                    this.fetchArticles();
+                    this.showSuccessToast(`Article ${this.article.id}  Created`);
+                    this.$bvModal.hide('article-create-modal');
+                })
+                .catch(err => console.error(err));
+        },
+        showArticle(article) {
+            this.article = article;
+            this.$bvModal.show('article-show-modal');
         },
         editArticle(article) {
-            console.log(this.$options.name + ' editArticle');
-            this.currentArticle(article);
-            this.edit = true;
+            this.article = article;
+            this.$bvModal.show('article-edit-modal');
+        },
+        updateArticle({ title, body }) {
+            return axios
+                .put(`api/articles/${this.article.id}`, {
+                    title: title,
+                    body: body,
+                })
+                .then(({ article }) => {
+                    this.fetchArticles();
+                    this.showSuccessToast(`Article ${this.article.id}  Updated`);
+                    this.$bvModal.hide('article-edit-modal');
+                })
+                .catch(err => console.error(err));
+        },
+        deleteArticle(article) {
+            return axios
+                .delete(`api/articles/${article.id}`)
+                .then(({ article }) => {
+                    this.fetchArticles(this.currentPage);
+                    this.showSuccessToast(`Article ${article.id} Removed`);
+                })
+                .catch(err => console.error(err));
+        },
+        showSuccessToast(title) {
+            this.$bvToast.toast(title, {
+                toaster: "b-toaster-bottom-right",
+                autoHideDelay: 3000,
+                variant: "success",
+                title: 'Success',
+            });
         }
     },
     mounted() {
