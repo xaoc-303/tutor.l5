@@ -3,103 +3,72 @@
 namespace App\Http\Controllers;
 
 use App\Article;
-use App\Http\Resources\Article as ArticleResource;
-use Illuminate\Http\Request;
+use App\Http\Requests\API\Article\StoreArticle;
+use App\Http\Requests\API\Article\UpdateArticle;
+use App\Http\Responses\API\Article\IndexArticlesResponse;
+use App\Http\Responses\API\Article\ShowArticleResponse;
 
 class ArticleController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return \App\Http\Responses\API\Article\IndexArticlesResponse
      */
     public function index()
     {
-        $articles = Article::orderBy('created_at','desc')->paginate(3);
-
-        return ArticleResource::collection($articles);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return new IndexArticlesResponse(Article::latest()->paginate(3));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return ArticleResource
+     * @param  \App\Http\Requests\API\Article\StoreArticle  $request
+     * @return \App\Http\Responses\API\Article\ShowArticleResponse
      */
-    public function store(Request $request)
+    public function store(StoreArticle $request)
     {
-        $article = $request->isMethod('put')
-            ? Article::findOrFail($request->article_id)
-            : new Article();
+        $article = Article::create($request->validated());
 
-        $article->id = $request->input('article_id');
-        $article->title = $request->input('title');
-        $article->body = $request->input('body');
-
-        if ($article->save()) {
-            return new ArticleResource($article);
-        }
+        return new ShowArticleResponse($article);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return ArticleResource
+     * @param  \App\Article  $article
+     * @return \App\Http\Responses\API\Article\ShowArticleResponse
      */
-    public function show($id)
+    public function show(Article $article)
     {
-        $article = Article::findOrFail($id);
-
-        return new ArticleResource($article);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        return new ShowArticleResponse($article);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  \App\Http\Requests\API\Article\UpdateArticle  $request
+     * @param  \App\Article  $article
+     * @return \App\Http\Responses\API\Article\ShowArticleResponse
      */
-    public function update(Request $request, $id)
+    public function update(UpdateArticle $request, Article $article)
     {
-        //
+        $article->update($request->validated());
+
+        return new ShowArticleResponse($article);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param $id
-     * @return ArticleResource
+     * @param  \App\Article  $article
+     * @return \App\Http\Responses\API\Article\ShowArticleResponse
      * @throws \Exception
      */
-    public function destroy($id)
+    public function destroy(Article $article)
     {
-        $article = Article::findOrFail($id);
+        $article->delete();
 
-        if ($article->delete()) {
-            return new ArticleResource($article);
-        }
+        return new ShowArticleResponse($article);
     }
 }
